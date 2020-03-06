@@ -3,11 +3,11 @@ import Account, { AccountJSON } from "../../src/wallet/Account";
 jest.mock("../../src/wallet/nep2");
 
 describe("constructor", () => {
-  test.each([
-    ["WIF", "L2QTooFoDFyRFTxmtiVHt5CfsXfVnexdbENGDkkrrgTTryiLsPMG"],
+  test.only.each([
+    ["WIF", "L3auJnrZymEwaTHokbF2YwB4PKGSZjD49uUMCSMV9cbNZiBH5Lwa"],
     [
       "privateKey",
-      "9ab7e154840daca3a2efadaf0df93cd3a5b51768c632f5433f86909d9b994a69"
+      "bded1d82c369de5e896f5039ade2d8d1942f15449a787d842a742f36c83d83be"
     ],
     [
       "publicKey",
@@ -22,6 +22,7 @@ describe("constructor", () => {
   ])("%s", (msg: string, data: string) => {
     const result = new Account(data);
     expect(result instanceof Account).toBeTruthy();
+    console.log(result.address);
     expect(result.address).toBe("AZzpS2oDPRtPwFp6C9ric98KCXGZiic6RV");
   });
 

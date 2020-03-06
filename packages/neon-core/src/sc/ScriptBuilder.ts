@@ -103,7 +103,7 @@ export class ScriptBuilder extends StringStream {
   public emitPush(data?: any): this {
     switch (typeof data) {
       case "boolean":
-        return this.emit(data ? OpCode.PUSHT : OpCode.PUSHF);
+        return this.emit(data ? OpCode.PUSH1 : OpCode.PUSH0);
       case "string":
         return this._emitString(data as string);
       case "number":
@@ -144,11 +144,7 @@ export class ScriptBuilder extends StringStream {
   private _emitString(hexstring: string): this {
     ensureHex(hexstring);
     const size = hexstring.length / 2;
-    if (size <= 75 /* PUSHBYTES75 */) {
-      // this is actually pushing opcode PUSHBYTES1-75, will generate fee.
-      this.str += num2hexstring(size);
-      this.str += hexstring;
-    } else if (size < 0x100) {
+    if (size < 0x100) {
       this.emit(OpCode.PUSHDATA1);
       this.str += num2hexstring(size);
       this.str += hexstring;
@@ -210,7 +206,7 @@ export class ScriptBuilder extends StringStream {
       case ContractParamType.String:
         return this._emitString(str2hexstring(param.value));
       case ContractParamType.Boolean:
-        return this.emit(param.value ? OpCode.PUSHT : OpCode.PUSHF);
+        return this.emit(param.value ? OpCode.PUSH1 : OpCode.PUSH0);
       case ContractParamType.Integer:
         return this._emitNum(param.value);
       case ContractParamType.ByteArray:

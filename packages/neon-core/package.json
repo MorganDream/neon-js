@@ -1,7 +1,7 @@
 {
-  "name": "@cityofzion/neon-core",
+  "name": "morgan-neon-core",
   "description": "Neon-JS Core functionality",
-  "version": "5.0.0-next.2",
+  "version": "5.0.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CityOfZion/neon-js.git"
@@ -15,7 +15,7 @@
     "javascript",
     "libraries"
   ],
-  "author": "Yak Jun Xiang <snowypowers@gmail.com> (https://github.com/snowypowers)",
+  "author": "mengzhen@onchain.com",
   "license": "MIT",
   "main": "dist/index.js",
   "browser": "dist/browser.js",

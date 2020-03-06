@@ -21,7 +21,7 @@ export function constructMultiSigVerificationScript(
     ss.emitPush(k);
   });
   ss.emitPush(keys.length);
-  ss.emitSysCall(InteropServiceCode.NEO_CRYPTO_CHECKMULTISIG);
+  ss.emitSysCall(InteropServiceCode.NEO_CRYPTO_ECDSACHECKMULTISIG);
   return ss.str;
 }
 
@@ -36,7 +36,7 @@ export function getPublicKeysFromVerificationScript(
   const keys = [] as string[];
   while (!ss.isEmpty()) {
     const byte = ss.read();
-    if (byte === OpCode.PUSHBYTES33) {
+    if (byte === "21") {
       keys.push(ss.read(33));
     }
   }
@@ -53,10 +53,10 @@ export function getSigningThresholdFromVerificationScript(
   const checkSigInteropCode = verificationScript.slice(
     verificationScript.length - 8
   );
-  if (checkSigInteropCode === InteropServiceCode.NEO_CRYPTO_CHECKSIG) {
+  if (checkSigInteropCode === InteropServiceCode.NEO_CRYPTO_ECDSAVERIFY) {
     return 1;
   } else if (
-    checkSigInteropCode === InteropServiceCode.NEO_CRYPTO_CHECKMULTISIG
+    checkSigInteropCode === InteropServiceCode.NEO_CRYPTO_ECDSACHECKMULTISIG
   ) {
     const ss = new StringStream(verificationScript);
     const byte = parseInt(ss.peek(), 16);
