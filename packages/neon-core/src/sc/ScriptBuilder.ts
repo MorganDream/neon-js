@@ -152,12 +152,10 @@ export class ScriptBuilder extends StringStream {
       this.emit(OpCode.PUSHDATA2);
       this.str += num2hexstring(size, 2, true);
       this.str += hexstring;
-    } else if (size < 0x100000000) {
+    } else {
       this.emit(OpCode.PUSHDATA4);
       this.str += num2hexstring(size, 4, true);
       this.str += hexstring;
-    } else {
-      throw new Error(`String too big to emit!`);
     }
     return this;
   }
@@ -170,25 +168,27 @@ export class ScriptBuilder extends StringStream {
    */
   private _emitNum(num: number | string): this {
     const bn = new BN(num);
-    if (bn.eqn(-1)) {
-      return this.emit(OpCode.PUSHM1);
-    }
-    if (bn.eqn(0)) {
-      return this.emit(OpCode.PUSH0);
-    }
-    if (bn.gtn(0) && bn.lten(16)) {
+    if (bn.gten(-1) && bn.lten(16)) {
       return this.emit(
-        num2hexstring(81 /* PUSH1 */ - 1 + bn.toNumber()) as OpCode
+        num2hexstring(16/* PUSH0 */ + bn.toNumber()) as OpCode
       );
     }
-    const msbSet = bn.testn(bn.byteLength() * 8 - 1);
 
-    const hex = bn
-      .toTwos(bn.byteLength() * 8)
-      .toString(16, bn.byteLength() * 2);
-    const paddedHex = !bn.isNeg() && msbSet ? "00" + hex : hex;
+    const size = bn.byteLength();
+    // const msbSet = bn.testn(bn.byteLength() * 8 - 1);
 
-    return this.emitPush(reverseHex(paddedHex));
+    // const hex = bn
+    //   .toTwos(bn.byteLength() * 8)
+    //   .toString(16, bn.byteLength() * 2);
+    // const paddedHex = !bn.isNeg() && msbSet ? "00" + hex : hex;
+
+    if (size === 1) return this.emit(OpCode.PUSHINT8, bn.toString('hex', 2));
+    if (size === 2) return this.emit(OpCode.PUSHINT16, reverseHex(bn.toString('hex', 4)));
+    if (size <= 4) return this.emit(OpCode.PUSHINT32, reverseHex(bn.toString('hex', 8)));
+    if (size <= 8) return this.emit(OpCode.PUSHINT64, reverseHex(bn.toString('hex', 16)));
+    if (size <= 16) return this.emit(OpCode.PUSHINT128, reverseHex(bn.toString('hex', 32)));
+    if (size <= 32) return this.emit(OpCode.PUSHINT256, reverseHex(bn.toString('hex', 64)));
+    throw new RangeError();
   }
 
   /**

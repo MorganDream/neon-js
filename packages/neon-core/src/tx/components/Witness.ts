@@ -14,6 +14,7 @@ import {
   verify
 } from "../../wallet";
 import { NeonObject } from "../../model";
+import { ScriptBuilder } from "../../sc";
 
 export interface WitnessLike {
   invocationScript: string;
@@ -38,7 +39,9 @@ export class Witness implements NeonObject<WitnessLike> {
   }
 
   public static fromSignature(sig: string, publicKey: string): Witness {
-    const invocationScript = "40" + sig;
+    const invocationSb = new ScriptBuilder();
+    invocationSb.emitPush(sig);
+    const invocationScript = invocationSb.str;
     const verificationScript = getVerificationScriptFromPublicKey(publicKey);
     return new Witness({ invocationScript, verificationScript });
   }
@@ -95,7 +98,7 @@ export class Witness implements NeonObject<WitnessLike> {
     return new Witness({
       invocationScript: validSigs
         .slice(0, signingThreshold)
-        .map(s => "40" + s)
+        .map(s => new ScriptBuilder().emitPush(s).str)
         .join(""),
       verificationScript
     });

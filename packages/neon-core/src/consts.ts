@@ -10,10 +10,37 @@ export const NATIVE_CONTRACTS: { [key: string]: string } = {
 };
 
 export const ASSET_ID: { [key: string]: string } = {
-  NEO: "43cf98eddbe047e198a3e5d57006311442a0ca15",
-  GAS: "a1760976db5fcdfab2a9930e8f6ce875b2d18225",
+  NEO: "9bde8f209c88dd0e7ca3bf0af0f476cdd8207789",
+  GAS: "8c23f196d8a1bfd103a9dcb1f9ccf0c611377d3b",
   POLICY: "9c5699b260bd468e2160dd5d45dfd2686bba8b77"
 };
+
+interface RESPONSE {
+  prop_A: string;
+  prop_B: number;
+  prop_C: number;
+}
+
+const obj: {
+  a: number;
+  b: string;
+  c?: any
+} = {
+  a: 1,
+  b: 'string',
+};
+
+obj.c = null;
+
+function plunk<T extends keyof RESPONSE, K extends RESPONSE[T]>(value: K) {
+  return value;
+}
+
+function plunk2(value: RESPONSE[keyof RESPONSE]) {
+
+}
+
+plunk()
 
 export const ASSET_TYPE: { [key: string]: number } = {
   CreditFlag: 0x40,
@@ -91,3 +118,26 @@ export const SYSTEM_FEE_FREE = 0;
 
 // you can also get this value by querying policy native contract method `getFeePerByte`
 export const POLICY_FEE_PERBYTE = 1000e-8;
+
+interface MyInterface {
+  name: string;
+  new(name: string): MyInterface;
+}
+
+// interface MyInterfaceConstructor {
+//   new(name: string): MyInterface;
+// }
+
+class Bar implements MyInterface {
+  constructor(public name: string) {}
+}
+class Foo implements MyInterface {
+  constructor(public name: string) {}
+}
+
+function myfn(Klass: MyInterface, name: string) {
+  return new Klass(name);
+}
+
+myfn(Bar, 'test');
+myfn(Foo, 'test');

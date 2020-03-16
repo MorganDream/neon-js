@@ -8,22 +8,12 @@ describe("constructor", () => {
     [
       "privateKey",
       "bded1d82c369de5e896f5039ade2d8d1942f15449a787d842a742f36c83d83be"
-    ],
-    [
-      "publicKey",
-      "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9"
-    ],
-    [
-      "publicKeyUnencoded",
-      "041d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c94617303f7408d9abfedfb6fbb00dd07e3e7735d918bbea7a7e2c1895ea1bc9b9"
-    ],
-    ["scriptHash", "dec317f6e4335db8a98418bd16960bf4e7fce4c7"],
-    ["address", "AZzpS2oDPRtPwFp6C9ric98KCXGZiic6RV"]
+    ]
   ])("%s", (msg: string, data: string) => {
     const result = new Account(data);
     expect(result instanceof Account).toBeTruthy();
-    console.log(result.address);
-    expect(result.address).toBe("AZzpS2oDPRtPwFp6C9ric98KCXGZiic6RV");
+    console.log(result.WIF);
+    expect(result).toBe({});
   });
 
   test("empty", () => {

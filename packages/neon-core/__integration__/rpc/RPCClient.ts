@@ -1,4 +1,4 @@
-import { rpc, CONST } from "../../src/index";
+import { rpc, CONST, wallet } from "../../src/index";
 import { ContractParam, createScript } from "../../src/sc";
 import { Transaction, WitnessScope } from "../../src/tx";
 import { Account } from "../../src/wallet";
@@ -239,13 +239,25 @@ describe("RPC Methods", () => {
 
   describe("Invocation methods", () => {
     test("invokeFunction", async () => {
-      const result = await client.invokeFunction(contractHash, "name");
-
-      expect(Object.keys(result)).toEqual(
-        expect.arrayContaining(["script", "state", "gas_consumed", "stack"])
-      );
-      expect(result.state).toContain("HALT");
-      expect(result.stack[0].value).toEqual("474153");
+      // console.log(wallet.isAddress('NiNmXL8FjEUEs1nfX9uHFBNaenxDHJtmuB'));
+      // console.log(wallet.getScriptHashFromAddress('NiNmXL8FjEUEs1nfX9uHFBNaenxDHJtmuB'));
+      client = new rpc.RPCClient('http://192.168.1.215:10331');
+      const from = ContractParam.hash160('NiNmXL8FjEUEs1nfX9uHFBNaenxDHJtmuB');
+      const to = ContractParam.hash160('NWySkpUYVB15zUHmdwVZsQFk8MpHgn1PUJ')
+      const script = createScript({
+        scriptHash: '1a6bdc2f9d7218433e7f791754b47743fdcf6402',
+        operation: 'transfer',
+        args: [
+          from, to, 1000
+        ]
+      })
+      // console.log(result.script);
+      console.log(script)
+      // expect(Object.keys(result)).toEqual(
+      //   expect.arrayContaining(["script", "state", "gas_consumed", "stack"])
+      // );
+      // expect(result.state).toContain("HALT");
+      // expect(result.stack[0].value).toEqual("474153");
     });
 
     test("invokeScript", async () => {
@@ -259,16 +271,19 @@ describe("RPC Methods", () => {
     });
   });
 
-  test("sendRawTransaction", async () => {
-    const account = new Account(privateKey);
+  test.only("sendRawTransaction", async () => {
+    const _rpcClient = new rpc.RPCClient('http://192.168.1.215:10331');
+    const account = new Account('KxE7Uwq3Bog6NP636ksh4Yhh92x4S4SKB4wHo3Rt1UJLGGuS8TDm');
+    console.log(account.address);
     const addressInHash160 = ContractParam.hash160(account.address);
+    const to = ContractParam.hash160('NiNmXL8FjEUEs1nfX9uHFBNaenxDHJtmuB');
     const script = createScript({
-      scriptHash: CONST.ASSET_ID.NEO,
+      scriptHash: CONST.ASSET_ID.GAS,
       operation: "transfer",
-      args: [addressInHash160, addressInHash160, 1]
+      args: [addressInHash160, to, 1]
     });
 
-    const currentHeight = await client.getBlockCount();
+    const currentHeight = await _rpcClient.getBlockCount();
     const transaction = new Transaction({
       sender: reverseHex(account.scriptHash),
       cosigners: [
@@ -278,12 +293,22 @@ describe("RPC Methods", () => {
         }
       ],
       validUntilBlock: currentHeight + Transaction.MAX_TRANSACTION_LIFESPAN - 1,
-      systemFee: 1,
-      networkFee: 1,
+      systemFee: 10,
+      networkFee: 10,
       script: script
     }).sign(account);
-    const result = await client.sendRawTransaction(transaction.serialize(true));
+    const result = await _rpcClient.sendRawTransaction(transaction.serialize(true));
+    console.log(transaction.serialize(true));
     expect(typeof result).toBe("string");
+
+    // const getBalanceScript = createScript({
+    //   scriptHash: CONST.ASSET_ID.NEO,
+    //   operation: 'name',
+    //   args: []
+    // });
+
+    // const res = await _rpcClient.invokeFunction(CONST.ASSET_ID.GAS, 'name');
+    // console.log(res);
   });
 
   test("submitBlock", () => {
